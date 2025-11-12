@@ -4,6 +4,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import bgImg from "../assets/login-bg.png";
 
 const Login = () => {
   const { login, googleLogin } = useAuth();
@@ -34,7 +35,7 @@ const Login = () => {
     try {
       await login(email, password);
       toast.success("✅ Login successful!", {
-        onClose: () => navigate(from, { replace: true }), 
+        onClose: () => navigate(from, { replace: true }),
       });
     } catch (err) {
       const msg = friendlyFirebaseError(err.message || "Login failed");
@@ -63,85 +64,114 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-12 p-6 bg-slate-900 text-white rounded shadow">
-      <h2 className="text-2xl  font-bold  text-center mb-2 
-      underline underline-offset-6">Login</h2>
+    <section className="max-w-[1400px] mx-auto h-[1000px]  
+     border-slate-600 rounded border-4 pt-4"  style={{ backgroundImage: "url('/Sprinkle.svg')" }}>
+    {/* <div className="relative bg-slate-500  max-w-lg mx-auto mt-12 p-6 rounded shadow overflow-hidden"> */}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        {/* Email */}
-        <input
-          className="border p-2 rounded font-semibold  "
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+    <div className="relative bg-slate-500  max-w-lg mx-auto
+     mt-55 p-6 pb-37 pt-16  rounded shadow overflow-hidden">
+      {/* Background image (covers the card) */}
+      <img
+        src={bgImg}
+        alt="bg"
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+      />
 
-        {/* Password */}
-        <div className="relative">
+      {/* Dark overlay to keep same dark look and readable text */}
+      <div className="absolute inset-0 bg-slate-900/70 pointer-events-none" />
+
+      {/* Actual content */}
+      <div className="relative z-10 text-white">
+        <h2 className="text-2xl font-bold text-center mb-2 underline underline-offset-6">
+          Login
+        </h2>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {/* Email */}
           <input
-            className="border p-2 text-sa rounded w-full pr-10"
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            className="border p-2 rounded font-semibold bg-transparent text-white placeholder:text-slate-300"
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <span
-            className="absolute right-3 top-2.5 cursor-pointer select-none text-gray-600"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? "🙈" : "👁️"}
-          </span>
-        </div>
 
-        {/* Forgot Password */}
-        <div className="flex items-center justify-between text-sm">
-          <Link
-            to={`/forgot?email=${encodeURIComponent(email)}`}
-            className="text-white hover:underline  cursor-pointer font-bold text-[15px]"
-          >
-            Forgot Password?
-          </Link>
-        </div>
+          {/* Password */}
+          <div className="relative">
+            <input
+              className="border p-2 rounded w-full pr-10 bg-transparent text-white placeholder:text-slate-300"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <span
+              className="absolute right-3 top-2.5 cursor-pointer select-none text-gray-300"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "🙈" : "👁️"}
+            </span>
+          </div>
 
-        {/* Error Message */}
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+          {/* Forgot Password */}
+          {/* <div className="flex items-center justify-between text-sm">
+            <Link
+              to={`/forgot?email=${encodeURIComponent(email)}`}
+              className="text-white hover:underline cursor-pointer font-bold text-[15px]"
+            >
+              Forgot Password?
+            </Link>
+          </div> */}
 
-        {/* Login Button */}
+          {/* Error Message */}
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+
+          {/* Login Button */}
+          <button
+            type="submit"
+            className={`mt-2 font-bold cursor-pointer 
+              text-[18px] text-white py-2 rounded  ${
+              loading ? "opacity-60" : ""
+            }`}
+            disabled={loading}
+              >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+
+        {/* Google Login */}
         <button
-          type="submit"
-          className={`mt-2 bg-blue-600 font-bold  cursor-pointer text-[18px] text-white py-2 rounded ${
-            loading ? "opacity-60" : ""
-          }`}
+          onClick={handleGoogle}
+          className="mt-4 w-full font-bold cursor-pointer hover:underline text-white py-2 rounded"
           disabled={loading}
         >
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Please wait..." : "Continue with Google"}
         </button>
-      </form>
 
-      {/* Google Login */}
-      <button
-        onClick={handleGoogle}
-        className="mt-4 w-full font-bold  cursor-pointer hover:underline text-white py-2 rounded"
-        disabled={loading}
-      >
-        {loading ? "Please wait..." : "Continue with Google"}
-      </button>
+        {/* Signup Redirect */}
+        <p className="mt-4 text-center text-sm text-[17px] font-bold">
+          Don’t have an account?{" "}
+          <Link
+            to="/signup"
+            className="text-blue-400 font-bold text-[18px] hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
 
-      {/* Signup Redirect */}
-      <p className="mt-4 text-center text-sm text-[17px] font-bold">
-        Don’t have an account?{" "}
-        <Link to="/signup" className="text-blue-500 font-bold text-[18px] hover:underline">
-          Sign up
-        </Link>
-      </p>
-
-      {/* Toast Container */}
-      <ToastContainer position="top-center" autoClose={800} />
+        {/* Toast Container */}
+        <ToastContainer position="top-center" autoClose={800} />
+      </div>
     </div>
+    {/* </div> */}
+</section>
+
   );
+
+
 };
 
 export default Login;

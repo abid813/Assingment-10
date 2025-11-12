@@ -61,7 +61,11 @@ const Signup = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded shadow">
+
+        <section className="max-w-[1400px] mx-auto h-[1000px]  border-slate-600 rounded pt-4"  style={{ backgroundImage: "url('/Sprinkle.svg')" }}>
+
+
+    <div className="max-w-md mx-auto mt-12 p-6 bg-slate-800 text-white rounded shadow">
       <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -109,26 +113,31 @@ const Signup = () => {
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <button className="mt-2 bg-blue-600 text-white py-2 rounded">
+        <button className="mt-2 font-bold text-white py-2 rounded" style={{ background: "linear-gradient(to right,#0000,#0f9b0f)" }}>
           Register
         </button>
       </form>
 
       <button
-        onClick={handleGoogleLogin}
-        className="mt-4 w-full bg-red-500 text-white py-2 rounded"
-      >
-        Continue with Google
-      </button>
+  onClick={handleGoogleLogin}
+  className="mt-4 w-full font-bold text-white py-2 p-4 rounded"
+  style={{ background: "linear-gradient(to right, #ba8b, #181)" }}
+>
+  Continue with Google
+</button>
 
-      <p className="mt-4 text-center text-sm">
+
+      <p className="mt-4 text-center font-bold text-sm">
         Already have an account?{" "}
-        <Link to="/login" className="text-blue-500">
+        <Link to="/login" className="text-blue-500 font-bold">
           Login
         </Link>
       </p>
     </div>
+     </section>
   );
+
+ 
 };
 
 export default Signup;

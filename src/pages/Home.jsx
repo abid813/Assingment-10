@@ -1,282 +1,330 @@
 // src/pages/Home.jsx
-import React from "react";
-import servicesData from "../data/services.json";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css";
-import "swiper/css/navigation";
-import { Navigation, Autoplay } from "swiper/modules";
-import pet1 from "../assets/pet1.jpg"
-import pet3 from "../assets/pet3.jpg"
-import pet2 from "../assets/pet2.jpg"
-import petd1 from "../assets/petd1.jpg"
-import petd2 from "../assets/petd2.jpg"
-import petg2 from "../assets/petg2.jpg"
-import petw1 from "../assets/petw1.jpg"
-
+import React, { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
-const Home = () => {
+
+
+const BASE =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "/api"; // fallback to local /api
+
+function useTitle(title) {
+  useEffect(() => {
+    document.title = title ? `${title} - CleanCity` : "CleanCity";
+  }, [title]);
+}
+
+function Spinner({ size = 40 }) {
   return (
-    <div className="max-w-[1400px] mx-auto px-4">
-
-      {/*  Hero Slider Section */}
-      <section className="mt-6">
-        <Swiper
-          navigation={true}
-          autoplay={{ delay: 3000, disableOnInteraction: false }}
-          loop={true}
-          modules={[Navigation, Autoplay]}
-          className="rounded-xl overflow-hidden"
-        >
-          <SwiperSlide>
-            <div className="relative flex  justify-center items-center">
-              <img
-                src={petd1}
-                alt="Winter Coat for Dogs"
-                className="w-full h-[450px] md:h-[550px] object-cover "
-              />
-              <div className="absolute inset-0 b-black bg-opacity-40 flex flex-col justify-center items-center text-center text-white px-4">
-                <h2 className="text-white p-2 rounded-full text-3xl md:text-5xl font-bold  mb-3">
-                  Keep Your Pets Warm This Winter 
-                </h2>
-                <p className="text-lg text-white  md:text-xl max-w-2xl">
-                  Cozy coats, gentle grooming, and expert tips — everything your furry friend needs.
-                </p>
-                <button className="font-bold  mt-10 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg ">
-                  Explore Services
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-
-
-          <SwiperSlide>
-            <div className="relative flex  justify-center items-center">
-              <img
-                src={petd2}
-                alt="Winter Coat for Dogs"
-                className="w-full h-[450px] md:h-[550px] object-cover"
-              />
-              <div className="absolute inset-0 b-black bg-opacity-40 flex flex-col justify-center items-center text-center text-white px-4">
-                <h2 className="text-white p-2 rounded-full text-3xl md:text-5xl font-bold  mb-3">
-                  Keep Your Pets Warm This Winter 
-                </h2>
-                <p className="text-lg text-white  md:text-xl max-w-2xl">
-                  Cozy coats, gentle grooming, and expert tips — everything your furry friend needs.
-                </p>
-                <button className="font-bold  mt-10 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg ">
-                  Explore Services
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-
-
-          <SwiperSlide>
-            <div className="relative flex  justify-center items-center">
-              <img
-                src={pet1}
-                alt="Winter Coat for Dogs"
-                className="w-full h-[450px] md:h-[550px] object-cover "
-              />
-              <div className="absolute inset-0 b-black bg-opacity-40 flex flex-col justify-center items-center text-center text-white px-4">
-                <h2 className="text-white p-2 rounded-full text-3xl md:text-5xl font-bold  mb-3">
-                  Keep Your Pets Warm This Winter 
-                </h2>
-                <p className="text-lg text-white  md:text-xl max-w-2xl">
-                  Cozy coats, gentle grooming, and expert tips — everything your furry friend needs.
-                </p>
-                <button className="font-bold  mt-10 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg ">
-                  Explore Services
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-
-
-
-          <SwiperSlide>
-            <div className="relative">
-              <img
-                src={pet3}
-                alt="Winter Grooming"
-                className="w-full h-[450px] object-cover"
-              />
-              <div className="absolute inset-0  flex flex-col justify-center items-center text-center text-white px-4">
-                
-                {/* <p className="text-lg md:text-xl max-w-2xl">
-                  Moisturizing paw balm and safe winter shampoos to protect their skin and paws.
-                </p> */}
-                <button className="mt-5 font-bold
-                 bg-yellow-500
-                  hover:bg-yellow-600 text-2xl m
-                   text-white px-6 py-2 rounded-lg 
-                 ">
-                  Book Grooming Now
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-
-
-          <SwiperSlide>
-            <div className="relative">
-              <img
-                src={petg2}
-                alt="Winter Grooming"
-                className="w-full h-[450px] object-cover"
-              />
-              <div className="absolute inset-0  flex flex-col justify-center items-center text-center text-white px-4">
-                
-                {/* <p className="text-lg md:text-xl max-w-2xl">
-                  Moisturizing paw balm and safe winter shampoos to protect their skin and paws.
-                </p> */}
-                <button className="mt-5 font-bold
-                 bg-yellow-500
-                  hover:bg-yellow-600 text-2xl m
-                   text-white px-6 py-2 rounded-lg 
-                 ">
-                  Book Grooming Now
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-
-
-          <SwiperSlide>
-            <div className="relative">
-              <img
-                src={petw1}
-                alt="Winter Grooming"
-                className="w-full h-[450px] object-cover"
-              />
-              <div className="absolute inset-0  flex flex-col justify-center items-center text-center text-white px-4">
-                
-                {/* <p className="text-lg md:text-xl max-w-2xl">
-                  Moisturizing paw balm and safe winter shampoos to protect their skin and paws.
-                </p> */}
-                <button className="mt-5 font-bold
-                 bg-yellow-500
-                  hover:bg-yellow-600 text-2xl m
-                   text-white px-6 py-2 rounded-lg 
-                 ">
-                  Book Grooming Now
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-
-
-
-          <SwiperSlide>
-            <div className="relative">
-              <img
-                src={pet2}
-                alt="Pet Blanket"
-                className="w-full h-[450px] md:h-[550px] object-cover"
-              />
-              <div className="absolute inset-0 bg-opacity-40 flex flex-col justify-center items-center text-center text-white px-4">
-                <h2 className="text-3xl md:text-5xl font-bold mb-3">
-                  Snuggle Up with Cozy Blankets
-                </h2>
-                <p className="text-lg md:text-xl max-w-2xl">
-                  Give your pets the comfort of soft, warm blankets during chilly nights.
-                </p>
-                <button className="mt-5 bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg font-semibold">
-                  Shop Now
-                </button>
-              </div>
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </section>
-
-      {/*  Popular Winter Care Services Section */}
-      <section className="mt-10">
-  <h2 className="text-2xl font-bold mb-6 text-center">Popular Winter Care Services</h2>
-
-  <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 max-w-[1400px] mx-auto px-4">
-    {servicesData.map((service) => (
-      <article
-        key={service.serviceId}
-        className="bg-white rounded-lg shadow flex flex-col hover:shadow-lg transition"
+    <div className="flex items-center justify-center">
+      <svg
+        style={{ width: size, height: size }}
+        className="animate-spin text-gray-600"
+        viewBox="0 0 50 50"
       >
-        {/* RESPONSIVE IMAGE WITH FIXED ASPECT RATIO */}
-        <div className="w-full relative overflow-hidden rounded-[10px] pb-[75%]">
-          {/* pb-[75%] gives 4:3 aspect ratio */}
-          <img
-            src={service.image}
-            alt={service.serviceName}
-            className="absolute top-0 left-0 w-full h-full object-cover"
-          />
-        </div>
-
-        {/* CONTENT */}
-        <div className="p-4 flex flex-col gap-2 flex-1">
-          <h3 className="font-semibold text-lg line-clamp-2">{service.serviceName}</h3>
-          <p className="text-sm text-gray-500">{service.category}</p>
-          <p className="mt-1 font-bold text-blue-600">${service.price}</p>
-          <p className="text-yellow-500 mt-1">⭐ {service.rating}</p>
-
-          <Link
-  to={`/service/${service.serviceId}`}
-  className="mt-auto bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md text-sm text-center"
->
-  View Details
-</Link>
-        </div>
-      </article>
-    ))}
-  </div>
-</section>
-
-
-      {/*  Winter Care Tips Section */}
-      <section className="mt-12 bg-blue-50 rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">Winter Care Tips for Pets</h2>
-        <ul className="list-disc list-inside text-gray-700 space-y-2 max-w-2xl mx-auto">
-          <li>Keep pets warm with cozy clothing or blankets.</li>
-          <li>Provide nutritious meals to boost immunity.</li>
-          <li>Check paws regularly for cracks or ice.</li>
-          <li>Limit outdoor time during extreme cold.</li>
-        </ul>
-      </section>
-
-    {/*  Expert Vets Section */}
-<section className="mt-12 mb-12">
-  <h2 className="text-2xl font-bold mb-6 text-center text-blue-800">
-    Meet Our Expert Vets
-  </h2>
-
-  <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-    {[
-      { name: "Dr. Sarah", role: "Canine Specialist", img: "https://i.ibb.co/Kj63DZd9/petex1.jpg" },
-      { name: "Dr. Arifa", role: "Nutrition Expert", img: "https://i.ibb.co/Hf2jPGk3/petex2.jpg" },
-      { name: "Dr. Khalid", role: "Grooming Specialist", img: "https://i.ibb.co/jvHXJQf5/petex3.jpg" },
-      { name: "Dr. Omor", role: "Pet Behaviorist", img: "https://i.ibb.co/vG8PMWr/pet5.jpg" },
-    ].map((vet, index) => (
-      <div
-        key={index}
-        className="bg-white rounded-2xl shadow-md p-6 flex flex-col items-center hover:shadow-lg hover:scale-105 transition-transform duration-300"
-      >
-        <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-blue-200 shadow-sm">
-          <img
-            src={vet.img}
-            alt={vet.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
-
-        <h3 className="mt-4 font-semibold text-lg text-gray-800">{vet.name}</h3>
-        <p className="text-gray-500 text-sm">{vet.role}</p>
-      </div>
-    ))}
-  </div>
-</section>
-
-
+        <circle
+          className="opacity-25"
+          cx="25"
+          cy="25"
+          r="20"
+          stroke="currentColor"
+          strokeWidth="4"
+          fill="none"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M43.935 25.145a19.978 19.978 0 01-7.03 10.96 19.978 19.978 0 01-11.02 4.36 19.978 19.978 0 01-11.02-4.36 19.978 19.978 0 01-7.03-10.96 19.978 19.978 0 014.36-11.02 19.978 19.978 0 0110.96-7.03 19.978 19.978 0 0111.02 4.36 19.978 19.978 0 014.36 11.02z"
+        />
+      </svg>
     </div>
   );
-};
+}
 
-export default Home;
+export default function Home() {
+  useTitle("Home");
+
+  // Banner slider
+  const slides = [
+    {
+      id: 1,
+      title: "Report overflowing garbage in your area",
+      subtitle: "Help the community — report now and request cleanup drives.",
+      image:
+        "https://i.ibb.co.com/JjDn5nKy/Whats-App-Image-2025-11-11-at-09-06-14-0996ef6a.jpg",
+    },
+    {
+      id: 2,
+      title: "Join local cleanup drives",
+      subtitle: "Be a volunteer — join hands with your neighbors.",
+      image:
+        "https://i.ibb.co.com/pr2w621B/Whats-App-Image-2025-11-11-at-09-19-53-3b2bb9f4.jpg",
+    },
+    {
+      id: 3,
+      title: "Track and contribute to issue fixes",
+      subtitle: "Pay small contributions to support clean-up budgets.",
+      image:
+        "https://i.ibb.co.com/JWwq9jZW/Whats-App-Image-2025-11-11-at-09-29-56-dbfc8f16.jpg",
+    },
+  ];
+
+  const [index, setIndex] = useState(0);
+  const slideTimerRef = useRef(null);
+
+  useEffect(() => {
+    // autoplay every 5 seconds
+    slideTimerRef.current = setInterval(() => {
+      setIndex((i) => (i + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(slideTimerRef.current);
+  }, []);
+
+  // Recent complaints
+  const [issues, setIssues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    setError(null);
+
+    const url = `${BASE}/issues?limit=6`;
+    fetch(url)
+      .then(async (res) => {
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`${res.status} ${txt}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!mounted) return;
+        // Expecting array of issues
+        setIssues(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error("Failed to load recent issues:", err);
+        if (mounted) setError("Unable to load recent issues. Try again later.");
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Category cards
+  const categories = [
+    {
+      id: "garbage",
+      name: "Garbage",
+      desc: "Overflowing bins, unmanaged waste, and dangerous littering spots.",
+      icon: "🗑️",
+    },
+    {
+      id: "illegal-construction",
+      name: "Illegal Construction",
+      desc: "Unauthorized constructions causing hazards and obstruction.",
+      icon: "🏗️",
+    },
+    {
+      id: "broken-public",
+      name: "Broken Public Property",
+      desc: "Damaged benches, broken streetlights, vandalized public assets.",
+      icon: "🏚️",
+    },
+    {
+      id: "road-damage",
+      name: "Road Damage",
+      desc: "Potholes, broken sidewalks, and damaged drains causing waterlogging.",
+      icon: "🛣️",
+    },
+  ];
+
+  // Community stats example (you should replace with real API)
+  const stats = {
+    users: 1240,
+    resolved: 860,
+    pending: 380,
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Banner */}
+      <section className="relative">
+        <div className="h-[420px] md:h-[520px] w-full overflow-hidden rounded-b-lg shadow-inner">
+          <img
+            src={slides[index].image}
+            alt={slides[index].title}
+            className="w-full h-full object-cover brightness-90"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
+          <div className="absolute inset-0 flex items-center">
+            <div className="max-w-6xl mx-auto px-6 md:px-12 text-white">
+              <h1 className="text-3xl md:text-5xl font-bold leading-tight mb-3">
+                {slides[index].title}
+              </h1>
+              <p className="text-sm md:text-lg max-w-xl">{slides[index].subtitle}</p>
+
+              <div className="mt-6 flex gap-3">
+                <Link
+                  to="/add-issue"
+                  className="inline-block bg-green-500 hover:bg-green-600 px-5 py-3 rounded-md font-semibold shadow"
+                >
+                  Report an Issue
+                </Link>
+                <Link
+                  to="/issues"
+                  className="inline-block bg-white/20 hover:bg-white/30 px-5 py-3 rounded-md"
+                >
+                  Browse Issues
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Slider controls */}
+        <div className="max-w-6xl mx-auto px-6 md:px-12 relative -mt-12 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            {slides.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => setIndex(i)}
+                className={`w-2 h-2 rounded-full ${index === i ? "bg-green-600" : "bg-gray-300"}`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+
+          <div className="space-x-2">
+            <button
+              onClick={() => setIndex((i) => (i - 1 + slides.length) % slides.length)}
+              className="bg-white p-2 rounded shadow"
+              title="Previous"
+            >
+              ‹
+            </button>
+            <button
+              onClick={() => setIndex((i) => (i + 1) % slides.length)}
+              className="bg-white p-2 rounded shadow"
+              title="Next"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Categories */}
+      <section className="max-w-6xl mx-auto px-6 md:px-12 py-12">
+        <h2 className="text-2xl font-semibold mb-4 font-bold bg-gradient-to-r from-[#2a0845] to-[#6441a5] bg-clip-text text-transparent">Categories</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {categories.map((c) => (
+            <div key={c.id} className="bg-white  rounded-lg p-5 shadow-sm hover:shadow-md transition"
+             style={{ background: "linear-gradient(to right,#636363,#a2ab58)" }}>
+              <div className="text-3xl">{c.icon}</div>
+              <h3 className="font-semibold mt-3"><span className="text-white">→</span> {c.name}</h3>
+              <p className="text-sm mt-2 text-white">{c.desc}</p>
+              <div className="mt-4">
+                <Link to={`/issues?category=${c.id}`} className=" font-bold bg-gradient-to-r from-[#2a0845] to-[#6441a5] bg-clip-text text-transparent">
+                  See {c.name} issues →
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Recent Complaints */}
+      <section className="max-w-6xl mx-auto px-6 md:px-12 pb-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-semibold">Recent Complaints</h2>
+          <Link to="/issues" className="text-sm text-green-600 font-semibold">View All Issues</Link>
+        </div>
+
+        {loading ? (
+          <div className="bg-white p-8 rounded shadow text-center">
+            <Spinner />
+            <p className="mt-4 text-gray-600">Loading latest issues...</p>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 rounded p-6 text-red-700">
+            {error}
+          </div>
+        ) : issues.length === 0 ? (
+          <div className="bg-white p-6 rounded shadow text-gray-600">No issues reported yet.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {issues.map((issue) => (
+              <article key={issue._id || issue.id} className="bg-white border rounded-lg overflow-hidden shadow-sm">
+                <div className="h-44 bg-gray-100">
+                  <img
+                    src={issue.image || "https://images.unsplash.com/photo-1606788075760-11a6d1c6a5b5?auto=format&fit=crop&w=1200&q=60"}
+                    alt={issue.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold">{issue.title}</h3>
+                  <p className="text-xs text-gray-500 mt-1">{issue.category} • {issue.location}</p>
+                  <p className="text-sm text-gray-700 mt-2 line-clamp-3">{issue.description}</p>
+
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className="text-sm font-semibold">৳ {issue.amount ?? "—"}</span>
+                    <Link
+                      to={`/issues/${issue._id || issue.id}`}
+                      className="text-sm text-green-600 font-medium"
+                    >
+                      See Details
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Community stats + CTA */}
+      <section className="bg-white border-t">
+        <div className="max-w-6xl mx-auto px-6 md:px-12 py-12 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold font-bold bg-gradient-to-r from-[#2a0845] to-[#6441a5] bg-clip-text text-transparent">Community in numbers</h3>
+            <p className="text-gray-600">Active community members and recent progress.</p>
+            <div className="flex gap-6 mt-4">
+              <div>
+                <div className="text-2xl font-bold">{stats.users}</div>
+                <div className="text-xs text-gray-500">Registered users</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
+                <div className="text-xs text-gray-500">Issues resolved</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-500">{stats.pending}</div>
+                <div className="text-xs text-gray-500">Pending issues</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="md:col-span-2">
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="text-lg font-semibold">Join a cleanup drive</h4>
+                <p className="text-gray-600">Volunteer or start a cleanup drive in your area — bring your neighbors together.</p>
+              </div>
+              <div className="flex gap-3">
+                <Link to="/volunteer" className="px-4 py-2 rounded bg-green-600 text-white font-semibold">Volunteer</Link>
+                <Link to="/add-issue" className="px-4 py-2 rounded border border-green-600 font-semibold">Request Drive</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

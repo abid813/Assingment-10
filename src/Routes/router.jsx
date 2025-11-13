@@ -2,12 +2,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import MainLayout from "../Layouts/MainLayout";
 import Home from "../pages/Home";
-import Services from "../pages/Services"; // যদি ব্যবহার করি
-import Profile from "../pages/Profile";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Register from "../pages/Register";
-import ServiceDetails from "../pages/ServiceDetails"; // service detail if exist
 
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -26,8 +23,8 @@ const router = createBrowserRouter([
       { path: "/", element: <Home /> },
 
       // public pages
-      { path: "/services", element: <Services /> },
-      { path: "/profile", element: <Profile /> },
+      // { path: "/services", element: <Services /> },
+      // { path: "/profile", element: <Profile /> },
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Signup /> },
       { path: "/register", element: <Register /> },
@@ -61,14 +58,14 @@ const router = createBrowserRouter([
       },
 
       // service detail example (if you use a different detail route)
-      {
-        path: "/service/:id",
-        element: (
-          <ProtectedRoute>
-            <ServiceDetails />
-          </ProtectedRoute>
-        ),
-      },
+      // {
+      //   path: "/service/:id",
+      //   element: (
+      //     <ProtectedRoute>
+      //       <ServiceDetails />
+      //     </ProtectedRoute>
+      //   ),
+      // },
 
       // fallback handled in MainLayout (or add 404 route)
     ],

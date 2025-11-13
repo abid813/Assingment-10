@@ -69,7 +69,7 @@ const Login = () => {
     {/* <div className="relative bg-slate-500  max-w-lg mx-auto mt-12 p-6 rounded shadow overflow-hidden"> */}
 
     <div className="relative bg-slate-500  max-w-lg mx-auto
-     mt-55 p-6 pb-37 pt-16  rounded shadow overflow-hidden">
+     mt-15 p-6 pb-37 pt-16  rounded shadow overflow-hidden">
       {/* Background image (covers the card) */}
       <img
         src={bgImg}

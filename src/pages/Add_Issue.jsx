@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth"; // adjust path if needed
-
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import api from "../lib/api"; // centralized axios instance
 
 export default function Add_Issue() {
   const { user } = useAuth(); // expect { name, email, photoURL } or null
@@ -23,7 +22,6 @@ export default function Add_Issue() {
   const [error, setError] = useState(null);
   const [preview, setPreview] = useState(""); // image preview
 
-  // update image preview when image url changes
   useEffect(() => {
     setPreview(form.image ? form.image : "");
   }, [form.image]);
@@ -40,11 +38,6 @@ export default function Add_Issue() {
     if (!form.description.trim()) return "Description is required";
     if (!form.amount || Number(form.amount) < 0 || isNaN(Number(form.amount)))
       return "Valid amount is required";
-    // optional: validate image url format if non-empty
-    if (form.image && !/^https?:\/\/.+\.(jpg|jpeg|png|webp|gif|svg)$/i.test(form.image.trim())) {
-      // allow non-image or CDN links too, so keep this check optional (comment out if strict)
-      // return "Image must be a valid image URL (jpg, png, webp, gif, svg)";
-    }
     return null;
   };
 
@@ -52,7 +45,6 @@ export default function Add_Issue() {
     e.preventDefault();
     setError(null);
 
-    // check login
     if (!user || !user.email) {
       setError("You must be logged in to submit an issue.");
       return;
@@ -78,26 +70,20 @@ export default function Add_Issue() {
 
     try {
       setLoading(true);
-      const res = await fetch(`${BASE}/issues`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
 
-      if (!res.ok) {
-        // try to read text or json
-        let msg = `Server error ${res.status}`;
-        try {
-          const txt = await res.text();
-          if (txt) msg = txt;
-        } catch (e) {}
-        throw new Error(msg);
+      // ================================
+      // axios POST: /issues
+      // ================================
+      const res = await api.post("/issues", payload);
+      // If API returns insertedId:
+      if (res?.data?.insertedId) {
+        alert("✅ Issue submitted successfully!");
+      } else {
+        // fallback success message
+        alert("✅ Issue submitted (server responded).");
       }
 
-      const json = await res.json();
-      // success feedback (you can replace alert with toast)
-      alert("Issue submitted successfully!");
-      // reset form if you want
+      // Reset form
       setForm({
         title: "",
         category: "Garbage",
@@ -107,22 +93,38 @@ export default function Add_Issue() {
         amount: "",
         status: "ongoing",
       });
-      // redirect to My Issues
+
+      // Redirect to My Issues
       navigate("/my-issues");
     } catch (err) {
       console.error("Submit failed:", err);
-      setError(String(err.message || "Submission failed"));
+      // Better error message extraction
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data ||
+        err?.message ||
+        "Submission failed";
+      setError(String(msg));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-[60vh]  py-8" style={{ backgroundImage: "url('/Sprinkle.svg')" }}>
-      <div className="    max-w-3xl mx-auto p-6"   style={{ backgroundImage: "url('/Sprinkle.svg')" }}>
+    <main
+      className="min-h-[60vh] py-8 bg-green-200"
+      style={{ backgroundImage: "url('/Sprinkle.svg')" }}
+    >
+      <div
+        className="max-w-3xl mx-auto p-6"
+        style={{ backgroundImage: "url('/Sprinkle.svg')" }}
+      >
         <h1 className="text-2xl font-semibold mb-4 text-black">Add Issue</h1>
 
-        <form onSubmit={handleSubmit} className="text-white font-bold p-6 rounded-lg shadow-md space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className="text-white font-bold p-6 rounded-lg shadow-md space-y-4"
+        >
           {error && (
             <div className="text-red-700 bg-red-50 border border-red-100 p-3 rounded">
               {error}
@@ -138,11 +140,13 @@ export default function Add_Issue() {
               className="w-full border rounded px-3 py-2"
               placeholder="Short title of the issue"
             />
-          </div> 
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block  text-sm font-medium mb-1">Category *</label>
+              <label className="block text-sm font-medium mb-1">
+                Category *
+              </label>
               <select
                 name="category"
                 value={form.category}
@@ -157,7 +161,9 @@ export default function Add_Issue() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Location *</label>
+              <label className="block text-sm font-medium mb-1">
+                Location *
+              </label>
               <input
                 name="location"
                 value={form.location}
@@ -169,7 +175,9 @@ export default function Add_Issue() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Description *</label>
+            <label className="block text-sm font-medium mb-1">
+              Description *
+            </label>
             <textarea
               name="description"
               value={form.description}
@@ -181,7 +189,9 @@ export default function Add_Issue() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Image URL (optional)</label>
+            <label className="block text-sm font-medium mb-1">
+              Image URL (optional)
+            </label>
             <input
               name="image"
               value={form.image}
@@ -204,7 +214,9 @@ export default function Add_Issue() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Amount (৳) *</label>
+              <label className="block text-sm font-medium mb-1">
+                Amount (৳) *
+              </label>
               <input
                 name="amount"
                 value={form.amount}
@@ -222,7 +234,7 @@ export default function Add_Issue() {
                 name="status"
                 value={form.status}
                 onChange={handleChange}
-                className="w-full border rounded px-3 py-2  bg-black"
+                className="w-full border rounded px-3 py-2 bg-black"
               >
                 <option value="ongoing">ongoing</option>
                 <option value="ended">ended</option>
@@ -231,7 +243,7 @@ export default function Add_Issue() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1 ">Your Email</label>
+            <label className="block text-sm font-medium mb-1">Your Email</label>
             <input
               value={user?.email || ""}
               readOnly

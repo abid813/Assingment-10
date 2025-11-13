@@ -2,7 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// ✅ Correct BASE URL
+const BASE = import.meta.env.VITE_API_URL || "https://assingment10-server-side-1.onrender.com";
 
 function Spinner({ size = 40 }) {
   return (
@@ -19,17 +20,16 @@ export default function All_Issues() {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // optional UI state for search/filter (kept minimal per requirement)
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
-  const [sort, setSort] = useState("desc"); // desc = latest first
+  const [sort, setSort] = useState("desc");
 
   useEffect(() => {
     let mounted = true;
     setLoading(true);
     setError(null);
 
+    // ✅ Fetch from the new server
     fetch(`${BASE}/issues`)
       .then(async (res) => {
         if (!res.ok) {
@@ -42,7 +42,6 @@ export default function All_Issues() {
         if (!mounted) return;
         const normalized = (Array.isArray(data) ? data : []).map((it) => ({
           ...it,
-          // ensure createdAt is Date for sorting
           createdAt: it.createdAt ? new Date(it.createdAt) : new Date(),
         }));
         setIssues(normalized);
@@ -58,7 +57,6 @@ export default function All_Issues() {
     };
   }, []);
 
-  // derive filtered & sorted list
   const filtered = useMemo(() => {
     let list = issues;
 
@@ -84,7 +82,6 @@ export default function All_Issues() {
     return list;
   }, [issues, search, categoryFilter, sort]);
 
-  // unique categories for dropdown
   const categories = useMemo(() => {
     const set = new Set();
     issues.forEach((it) => {
@@ -96,7 +93,6 @@ export default function All_Issues() {
   return (
     <main className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Header + Filters */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <h1 className="text-2xl font-semibold">All Issues</h1>
 
@@ -135,7 +131,6 @@ export default function All_Issues() {
           </div>
         </div>
 
-        {/* Content */}
         {loading ? (
           <div className="bg-white p-6 rounded shadow">
             <Spinner />
@@ -149,7 +144,6 @@ export default function All_Issues() {
           <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {filtered.map((issue) => (
               <article key={issue._id || issue.id} className="bg-white rounded shadow overflow-hidden">
-                {/* Image */}
                 <div className="h-48 bg-gray-100">
                   <img
                     src={issue.image || "https://via.placeholder.com/800x480?text=No+Image"}
@@ -159,7 +153,6 @@ export default function All_Issues() {
                   />
                 </div>
 
-                {/* Body */}
                 <div className="p-4">
                   <div className="flex justify-between items-start gap-3">
                     <h2 className="text-lg font-semibold">{issue.title}</h2>
@@ -175,7 +168,6 @@ export default function All_Issues() {
                   </div>
 
                   <p className="text-xs text-gray-500 mt-1">{issue.category} • {issue.location}</p>
-
                   <p className="text-sm text-gray-700 mt-2 line-clamp-3">{issue.description}</p>
 
                   <div className="mt-4 flex items-center justify-between">
@@ -183,7 +175,6 @@ export default function All_Issues() {
                     <Link
                       to={`/issues/${issue._id || issue.id}`}
                       className="text-green-600 font-medium hover:underline"
-                      aria-label={`See details for ${issue.title}`}
                     >
                       See Details →
                     </Link>

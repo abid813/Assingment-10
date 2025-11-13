@@ -5,15 +5,14 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Register from "../pages/Register";
-
 import ProtectedRoute from "../components/ProtectedRoute";
 
-// **IMPORTANT**: Import the real pages you made for issues
-import AllIssues from "../pages/All_Issues";        // src/pages/All_Issues.jsx
-import AddIssue from "../pages/Add_Issue";         // src/pages/Add_Issue.jsx (private)
-import MyIssues from "../pages/My_Issues";        // src/pages/My_Issues.jsx (private)
-import MyContribution from "../pages/My_Contribution"; // src/pages/My_Contribution.jsx (private)
-import IssueDetails from "../pages/IssueDetails";  // src/pages/IssueDetails.jsx
+import AllIssues from "../pages/All_Issues";
+import AddIssue from "../pages/Add_Issue";
+import MyIssues from "../pages/My_Issues";
+import MyContribution from "../pages/My_Contribution";
+import IssueDetails from "../pages/IssueDetails";
+import NotFound from "../pages/NotFound"; // ✅ make sure you imported this
 
 const router = createBrowserRouter([
   {
@@ -23,15 +22,13 @@ const router = createBrowserRouter([
       { path: "/", element: <Home /> },
 
       // public pages
-      // { path: "/services", element: <Services /> },
-      // { path: "/profile", element: <Profile /> },
       { path: "/login", element: <Login /> },
       { path: "/signup", element: <Signup /> },
       { path: "/register", element: <Register /> },
-      { path: "/issues", element: <AllIssues /> },              // All Issues page (public)
-      { path: "/issues/:id", element: <IssueDetails /> },      // Issue details (you can wrap with ProtectedRoute if needed)
+      { path: "/issues", element: <AllIssues /> },
+      { path: "/issues/:id", element: <IssueDetails /> },
 
-      // protected routes (only for logged-in users)
+      // protected routes
       {
         path: "/add-issue",
         element: (
@@ -57,17 +54,8 @@ const router = createBrowserRouter([
         ),
       },
 
-      // service detail example (if you use a different detail route)
-      // {
-      //   path: "/service/:id",
-      //   element: (
-      //     <ProtectedRoute>
-      //       <ServiceDetails />
-      //     </ProtectedRoute>
-      //   ),
-      // },
-
-      // fallback handled in MainLayout (or add 404 route)
+      // ✅ Keep 404 at the very bottom
+      { path: "*", element: <NotFound /> },
     ],
   },
 ]);

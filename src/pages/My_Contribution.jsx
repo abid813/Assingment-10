@@ -4,14 +4,15 @@ import { useAuth } from "../hooks/useAuth";
 import { Link } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
-import api from "../lib/api"; // centralized axios
+
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function Spinner({ size = 36 }) {
   return (
     <div className="flex items-center justify-center py-8">
       <svg style={{ width: size, height: size }} className="animate-spin text-gray-600" viewBox="0 0 50 50">
         <circle cx="25" cy="25" r="20" stroke="currentColor" strokeWidth="4" fill="none" className="opacity-25" />
-        <path className="opacity-75" fill="currentColor" d="M43.935 25.145a19.978 19.978 0 01-7.03 10.96 ..." />
+        <path className="opacity-75" fill="currentColor" d="M43.935 25.145a19.978 19.978 0 01-7.03 10.96 ..."/>
       </svg>
     </div>
   );
@@ -38,38 +39,46 @@ export default function My_Contribution() {
     setLoading(true);
     setError(null);
 
-    // Prefer server-side filter by email: GET /contributions?email=...
-    api.get("/contributions", { params: { email: user.email } })
-      .then((res) => {
-        if (!mounted) return;
-        setContribs(Array.isArray(res.data) ? res.data : []);
-      })
-      .catch(async (err) => {
-        // fallback: try fetching all contributions (server may support all=true)
-        console.warn("Server-side filter failed, trying fallback:", err?.message || err);
-        try {
-          const r2 = await api.get("/contributions", { params: { all: true } });
+    // Prefer server-side filter by email if backend supports it:
+    // GET /contributions?email=user.email
+    fetch(`${BASE}/contributions?email=${encodeURIComponent(user.email)}`)
+      .then(async (res) => {
+        if (res.ok) {
+          const data = await res.json();
           if (!mounted) return;
-          const all = Array.isArray(r2.data) ? r2.data : [];
-          const mine = all.filter((c) => (c.email || "").toLowerCase() === (user.email || "").toLowerCase());
-          setContribs(mine);
-        } catch (err2) {
-          // final fallback: try plain /contributions and filter client-side
-          try {
-            const r3 = await api.get("/contributions");
-            if (!mounted) return;
-            const all = Array.isArray(r3.data) ? r3.data : [];
-            const mine = all.filter((c) => (c.email || "").toLowerCase() === (user.email || "").toLowerCase());
-            setContribs(mine);
-          } catch (finalErr) {
-            console.error("Contributions fetch error:", finalErr);
-            if (!mounted) return;
-            setError("কন্ট্রিবিউশন লোড করা যায়নি। সার্ভার চেক করো।");
-          }
+          setContribs(Array.isArray(data) ? data : []);
+          setLoading(false);
+        } else {
+          // fallback: fetch all contributions and filter client-side
+          throw new Error("server doesn't support email filter or returned error");
         }
       })
-      .finally(() => {
-        if (mounted) setLoading(false);
+      .catch(async () => {
+        try {
+          // fallback: fetch all contributions (may be heavy on large DB)
+          const r2 = await fetch(`${BASE}/contributions?all=true`);
+          // If your server doesn't support that either, try /contributions (it may require issueId -> then server can't return all)
+          if (!r2.ok) {
+            // final fallback: try plain GET /contributions (may fail if server expects issueId)
+            const r3 = await fetch(`${BASE}/contributions`);
+            if (!r3.ok) throw new Error("no contributions endpoint available");
+            const all = await r3.json();
+            if (!mounted) return;
+            const mine = (Array.isArray(all) ? all : []).filter((c) => (c.email || "").toLowerCase() === (user.email || "").toLowerCase());
+            setContribs(mine);
+          } else {
+            const all = await r2.json();
+            if (!mounted) return;
+            const mine = (Array.isArray(all) ? all : []).filter((c) => (c.email || "").toLowerCase() === (user.email || "").toLowerCase());
+            setContribs(mine);
+          }
+        } catch (err) {
+          console.error("Contributions fetch fallback error:", err);
+          if (!mounted) return;
+          setError("কন্ট্রিবিউশন লোড করা যায়নি। সার্ভার চেক করো।");
+        } finally {
+          if (mounted) setLoading(false);
+        }
       });
 
     return () => { mounted = false; };
@@ -133,6 +142,7 @@ export default function My_Contribution() {
       doc.text(`Email: ${user?.email || "-"}`, 14, 34);
       doc.text(`Total Paid (৳): ${totalPaid}`, 14, 42);
 
+      // prepare table rows
       const tableColumn = ["Issue", "Amount (৳)", "Date"];
       const tableRows = (rows || []).map((r) => [
         r.issueTitle || r.issueId || "-",
@@ -140,7 +150,7 @@ export default function My_Contribution() {
         r.date ? new Date(r.date).toLocaleString() : "-"
       ]);
 
-      // autodable
+      // autoTable
       // eslint-disable-next-line no-undef
       doc.autoTable({
         head: [tableColumn],
@@ -202,7 +212,7 @@ export default function My_Contribution() {
                   <tr key={c._id} className="border-t hover:bg-gray-50">
                     <td className="p-3">
                       <div className="font-medium">{c.issueTitle || c.issueId}</div>
-                      <div className="text-xs text-gray-500">{/* optional category */}</div>
+                      <div className="text-xs text-gray-500">{/* optional category if you stored it */}</div>
                     </td>
                     <td className="p-3">৳ {c.amount}</td>
                     <td className="p-3">{c.date ? new Date(c.date).toLocaleString() : "-"}</td>
@@ -210,6 +220,7 @@ export default function My_Contribution() {
                     <td className="p-3">
                       <div className="flex gap-2">
                         <button onClick={() => downloadContributionPDF(c)} className="px-3 py-1 bg-green-600 text-white rounded text-xs">Download PDF</button>
+                        {/* optional: download JSON */}
                         <a href={`data:application/json,${encodeURIComponent(JSON.stringify(c, null, 2))}`} download={`contrib_${c._id || Date.now()}.json`} className="px-3 py-1 bg-gray-200 rounded text-xs">JSON</a>
                       </div>
                     </td>

@@ -2,7 +2,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Link } from "react-router-dom";
-import api from "../lib/api"; // centralized axios
+
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function Spinner({ size = 36 }) {
   return (
@@ -21,20 +22,28 @@ export default function My_Issues() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Edit/Delete states...
+  // Update modal state
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editing, setEditing] = useState(null);
+  const [editing, setEditing] = useState(null); // issue being edited
   const [editForm, setEditForm] = useState({
-    title: "", category: "Garbage", location: "", description: "", image: "", amount: "", status: "ongoing",
+    title: "",
+    category: "Garbage",
+    location: "",
+    description: "",
+    image: "",
+    amount: "",
+    status: "ongoing",
   });
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState(null);
 
+  // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
 
+  // fetch user's issues
   useEffect(() => {
     let mounted = true;
     if (!user || !user.email) {
@@ -42,29 +51,41 @@ export default function My_Issues() {
       setLoading(false);
       return;
     }
+
     setLoading(true);
     setError(null);
 
-    // Prefer server-side filter if supported
-    api.get("/issues", { params: { email: user.email } })
-      .then(res => {
-        if (!mounted) return;
-        setIssues(Array.isArray(res.data) ? res.data : []);
+    // try server-side filtering first: /issues?email=user.email
+    fetch(`${BASE}/issues?email=${encodeURIComponent(user.email)}`)
+      .then(async (res) => {
+        if (res.ok) return res.json();
+        // if server returns 4xx/5xx, fallback to fetch all and filter client-side
+        throw new Error(`status ${res.status}`);
       })
-      .catch(async (err) => {
-        console.warn("Server-side filter failed, falling back to fetch-all:", err?.message);
+      .then((data) => {
+        if (!mounted) return;
+        // ensure array
+        setIssues(Array.isArray(data) ? data : []);
+      })
+      .catch(async () => {
+        // fallback: fetch all and filter client-side
         try {
-          const res2 = await api.get("/issues", { params: { limit: 1000 } });
+          const res2 = await fetch(`${BASE}/issues?limit=1000`); // try to fetch many
+          if (!res2.ok) throw new Error(`status ${res2.status}`);
+          const all = await res2.json();
           if (!mounted) return;
-          const all = Array.isArray(res2.data) ? res2.data : [];
-          const mine = all.filter(it => (it.email || "").toLowerCase() === (user.email || "").toLowerCase());
+          const mine = Array.isArray(all)
+            ? all.filter((it) => (it.email || "").toLowerCase() === (user.email || "").toLowerCase())
+            : [];
           setIssues(mine);
-        } catch (e) {
-          console.error("Failed to load issues fallback:", e);
+        } catch (err) {
+          console.error("Failed to load issues:", err);
           if (mounted) setError("Issue load failed. Server error or network.");
         }
       })
-      .finally(() => { if (mounted) setLoading(false); });
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
 
     return () => { mounted = false; };
   }, [user]);
@@ -86,16 +107,18 @@ export default function My_Issues() {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditForm(s => ({ ...s, [name]: value }));
+    setEditForm((s) => ({ ...s, [name]: value }));
   };
 
   const submitEdit = async (e) => {
     e.preventDefault();
     if (!editing) return;
+    // basic validation
     if (!editForm.title.trim() || !editForm.location.trim() || !editForm.description.trim()) {
       setEditError("Title, location and description are required.");
       return;
     }
+
     try {
       setEditLoading(true);
       setEditError(null);
@@ -110,15 +133,24 @@ export default function My_Issues() {
         status: editForm.status || "ongoing",
       };
 
-      const res = await api.put(`/issues/${editing._id}`, payload);
-      // optimistic update
-      setIssues(prev => prev.map(it => (String(it._id) === String(editing._id) ? { ...it, ...payload } : it)));
+      const res = await fetch(`${BASE}/issues/${editing._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `Server error ${res.status}`);
+      }
+
+      // optimistic update: update local state
+      setIssues((prev) => prev.map((it) => (String(it._id) === String(editing._id) ? { ...it, ...payload } : it)));
       setShowEditModal(false);
       alert("Issue updated successfully!");
     } catch (err) {
       console.error("Update failed:", err);
-      const msg = err?.response?.data?.message || err.message || "Update failed";
-      setEditError(String(msg));
+      setEditError("Update failed. Try again.");
     } finally {
       setEditLoading(false);
     }
@@ -134,15 +166,20 @@ export default function My_Issues() {
     if (!deletingId) return;
     try {
       setDeleteLoading(true);
-      const res = await api.delete(`/issues/${deletingId}`);
+      const res = await fetch(`${BASE}/issues/${deletingId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || `Server error ${res.status}`);
+      }
       // remove from UI
-      setIssues(prev => prev.filter(it => String(it._id) !== String(deletingId)));
+      setIssues((prev) => prev.filter((it) => String(it._id) !== String(deletingId)));
       setShowDeleteModal(false);
       alert("Issue deleted permanently.");
     } catch (err) {
       console.error("Delete failed:", err);
-      const msg = err?.response?.data?.message || err.message || "Delete failed";
-      setDeleteError(String(msg));
+      setDeleteError("Delete failed. Try again.");
     } finally {
       setDeleteLoading(false);
     }
@@ -151,15 +188,18 @@ export default function My_Issues() {
   const tableRows = useMemo(() => {
     return issues.map((it) => ({
       id: it._id || it.id,
-      title: it.title, category: it.category, location: it.location,
-      amount: it.amount, status: it.status, createdAt: it.createdAt,
+      title: it.title,
+      category: it.category,
+      location: it.location,
+      amount: it.amount,
+      status: it.status,
+      createdAt: it.createdAt,
     }));
   }, [issues]);
 
   return (
     <main className="min-h-screen bg-gray-50 py-8">
-
-        <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-semibold">My Issues</h1>
           <Link to="/add-issue" className="px-3 py-2 bg-green-600 text-white rounded">Add New Issue</Link>
@@ -297,10 +337,6 @@ export default function My_Issues() {
           </div>
         </div>
       )}
-
-      {/* ... UI unchanged (same as your original) ... */}
-      {/* For brevity, keep your existing JSX rendering code here (table, modals) */}
-      {/* Copy your existing rendering markup from your original file below */}
     </main>
   );
 }
